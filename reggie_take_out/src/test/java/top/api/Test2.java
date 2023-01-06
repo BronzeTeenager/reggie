@@ -61,9 +61,4 @@ public class Test2 {
         System.out.println(md5);
     }
 
-    @Test
-    void aes(){
-        Employee employee = employeeMapper.selectOne("管理员");
-        System.out.println(employee);
-    }
 }

@@ -52,7 +52,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         //排序
         queryWrapper.orderByDesc(Dish::getUpdateTime);
 
-        this.page(pageInfo);
+        this.page(pageInfo,queryWrapper);
 
         return pageInfo;
     }
