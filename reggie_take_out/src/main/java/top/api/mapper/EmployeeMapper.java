@@ -9,5 +9,4 @@ import top.api.pojo.Employee;
  */
 @Mapper
 public interface EmployeeMapper extends BaseMapper<Employee> {
-    void addAll();
 }
