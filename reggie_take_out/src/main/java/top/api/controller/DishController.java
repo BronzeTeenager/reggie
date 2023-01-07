@@ -29,11 +29,35 @@ public class DishController {
         return R.success("ok");
     }
 
+    /**
+     * 动态分页模糊查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
     @GetMapping("/page")
-    public R<Page<Dish>> page(int page,int pageSize, String name){
+    public R<Page<DishDto>> page(int page,int pageSize, String name){
 
-        Page<Dish> pageInfo = dishService.page(page, pageSize, name);
+        Page<DishDto> pageInfo = dishService.page(page, pageSize, name);
 
         return R.success("ok",pageInfo);
+    }
+
+    /**
+     * 根据id查询菜品信息 口味信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<DishDto> get (@PathVariable Long id){
+        DishDto withFlavor = dishService.getByIdWithFlavor(id);
+        return R.success("ok",withFlavor);
+    }
+
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto){
+        dishService.updateByIdWithFlavor(dishDto);
+        return R.success("ok");
     }
 }

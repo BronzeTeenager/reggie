@@ -17,5 +17,17 @@ public interface DishService extends IService<Dish> {
      * @param name
      * @return
      */
-    Page<Dish> page(int page, int pageSize, String name);
+    Page<DishDto> page(int page, int pageSize, String name);
+
+    /**
+     * 根据id查询菜品信息 口味信息
+     * @param id
+     * @return
+     */
+    DishDto getByIdWithFlavor(Long id);
+
+    /**
+     * 根据id修改菜品信息, 口味信息
+     */
+    void updateByIdWithFlavor(DishDto dishDto);
 }

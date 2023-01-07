@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Autowired
     private DishFlavorService dishFlavorService;
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     @Override
     public void saveWithFlavor(DishDto dishDto) {
         //保存菜品的基本信息到菜皮你个表dish
@@ -46,7 +47,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
-    public Page<Dish> page(int page, int pageSize, String name) {
+    public Page<DishDto> page(int page, int pageSize, String name) {
         /**
          * 踩坑提示
          * 使用mp分页 xml只需要写入模糊查询等条件即可,limit 分页 Page会自动帮我们加上
@@ -59,8 +60,49 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }
 
         //Page 对象必须放在第一位
-        Page<Dish> pageDish = dishMapper.page(pageInfo, page, pageSize, name);
+        Page<DishDto> pageDish = dishMapper.page(pageInfo, page, pageSize, name);
 
         return pageDish;
+    }
+
+    @Override
+    public DishDto getByIdWithFlavor(Long id) {
+        // 获取菜品信息
+        Dish dish = super.getById(id);
+
+        // 获取口味信息
+        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DishFlavor::getDishId,dish.getId());
+        List<DishFlavor> flavorList = dishFlavorService.list(queryWrapper);
+
+        DishDto dishDto = new DishDto();
+
+        //对象拷贝
+        BeanUtils.copyProperties(dish,dishDto);
+
+        dishDto.setFlavors(flavorList);
+
+        return dishDto;
+    }
+
+    @Override
+    @Transactional
+    public void updateByIdWithFlavor(DishDto dishDto) {
+        // 修改dish表
+        super.updateById(dishDto);
+
+        // 删除口味表信息,在保存
+        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DishFlavor::getDishId,dishDto.getId());
+        dishFlavorService.remove(queryWrapper);
+
+        //插入dish_id
+        for (DishFlavor flavor : dishDto.getFlavors()) {
+            flavor.setDishId(dishDto.getId());
+        }
+
+        // 批量保存
+        dishFlavorService.saveBatch(dishDto.getFlavors());
+
     }
 }

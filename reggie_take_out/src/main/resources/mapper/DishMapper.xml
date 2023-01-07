@@ -29,8 +29,8 @@
         update_user,is_deleted
     </sql>
 
-    <select id="page" resultType="top.api.pojo.Dish">
-        select * from dish
+    <select id="page" resultType="top.api.dto.DishDto">
+        select id, name, (SELECT name from category where id = category_id) as category_name, price, code, image, description, status, create_time, update_time, create_user, update_user, is_deleted from dish
         <if test="name != null and name != ''">
             where name like #{name}
         </if>

@@ -6,14 +6,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
+import org.springframework.stereotype.Repository;
+import top.api.dto.DishDto;
 import top.api.pojo.Dish;
 
+import javax.annotation.Resources;
 import java.util.List;
 
+@Repository
 @Mapper
 public interface DishMapper extends BaseMapper<Dish> {
 
 
     // Page对象必须放在第一位
-    Page<Dish> page(Page<Dish> pageInfo, @Param("page") int page, @Param("pageSize") int pageSize, @Param("name") String name);
+    Page<DishDto> page(Page<Dish> pageInfo, @Param("page") int page, @Param("pageSize") int pageSize, @Param("name") String name);
 }
