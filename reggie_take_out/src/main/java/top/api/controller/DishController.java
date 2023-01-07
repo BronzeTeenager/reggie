@@ -1,5 +1,6 @@
 package top.api.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,9 @@ public class DishController {
     }
 
     @GetMapping("/page")
-    public R<Page<Dish>> page(int page, int pageSize, String name){
-        Page<Dish> pageInfo = dishService.page(page,pageSize,name);
+    public R<Page<Dish>> page(int page,int pageSize, String name){
+
+        Page<Dish> pageInfo = dishService.page(page, pageSize, name);
 
         return R.success("ok",pageInfo);
     }

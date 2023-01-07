@@ -1,5 +1,6 @@
 package top.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.api.dto.DishDto;
@@ -16,5 +17,5 @@ public interface DishService extends IService<Dish> {
      * @param name
      * @return
      */
-    Page<Dish> page(int page,int pageSize,String name);
+    Page<Dish> page(int page, int pageSize, String name);
 }

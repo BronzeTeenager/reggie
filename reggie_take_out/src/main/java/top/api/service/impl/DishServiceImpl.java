@@ -1,8 +1,10 @@
 package top.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +17,12 @@ import top.api.service.DishService;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
 
     @Autowired
-    private DishService dishService;
+    private DishMapper dishMapper;
 
     @Autowired
     private DishFlavorService dishFlavorService;
@@ -44,16 +47,20 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Override
     public Page<Dish> page(int page, int pageSize, String name) {
+        /**
+         * 踩坑提示
+         * 使用mp分页 xml只需要写入模糊查询等条件即可,limit 分页 Page会自动帮我们加上
+         */
+
         Page<Dish> pageInfo = new Page<>(page,pageSize);
 
-        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        //模糊
-        queryWrapper.like(name != null,Dish::getName,name);
-        //排序
-        queryWrapper.orderByDesc(Dish::getUpdateTime);
+        if (name != null){
+            name = "%"+name+"%";
+        }
 
-        this.page(pageInfo,queryWrapper);
+        //Page 对象必须放在第一位
+        Page<Dish> pageDish = dishMapper.page(pageInfo, page, pageSize, name);
 
-        return pageInfo;
+        return pageDish;
     }
 }
