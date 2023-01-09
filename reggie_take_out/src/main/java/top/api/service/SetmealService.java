@@ -28,4 +28,17 @@ public interface SetmealService extends IService<Setmeal> {
      * @param ids
      */
     void removeWithDish(List<Long> ids);
+
+    /**
+     * 查询套餐信息
+     * @param id
+     * @return
+     */
+    SetmealDto getSetmealInfo(Long id);
+
+    /**
+     * 修改套餐表,套餐菜品表信息
+     * @param setmealDto
+     */
+    void updateSetmeal(SetmealDto setmealDto);
 }

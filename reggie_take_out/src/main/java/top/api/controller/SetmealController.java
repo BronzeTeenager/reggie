@@ -81,4 +81,27 @@ public class SetmealController {
         setmealService.update(updateWrapper);
         return R.success("ok");
     }
+
+    /**
+     *查询套餐信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<SetmealDto> getSetmealInfo(@PathVariable Long id){
+
+        SetmealDto setmealDto = setmealService.getSetmealInfo(id);
+        return R.success("ok",setmealDto);
+    }
+
+    /**
+     * 修改套餐, 套餐菜品 信息
+     * @param setmealDto
+     * @return
+     */
+    @PutMapping
+    public R<String> updateSetmeal(@RequestBody SetmealDto setmealDto){
+        setmealService.updateSetmeal(setmealDto);
+        return R.success("ok");
+    }
 }

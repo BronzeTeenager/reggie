@@ -3,6 +3,8 @@ package top.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import top.api.service.SetmealService;
 import java.util.List;
 
 @Service
+@Slf4j
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> implements SetmealService {
     @Autowired
     private SetmealDishService setmealDishService;
@@ -56,6 +59,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
+    @Transactional
     public void removeWithDish(List<Long> ids) {
         // 查询是否存在起售套餐
         LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -75,6 +79,51 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
         setmealDishLambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
         setmealDishService.remove(setmealDishLambdaQueryWrapper);
+
+    }
+
+    @Override
+    public SetmealDto getSetmealInfo(Long id) {
+        // 查询套餐
+        Setmeal setmeal = super.getById(id);
+
+        // 查询套餐菜品表
+        Long setmealId = setmeal.getId();
+        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealDishLambdaQueryWrapper.eq(SetmealDish::getSetmealId,setmealId);
+        List<SetmealDish> dishList = setmealDishService.list(setmealDishLambdaQueryWrapper);
+
+        // 拷贝
+        SetmealDto setmealDto = new SetmealDto();
+        BeanUtils.copyProperties(setmeal,setmealDto);
+
+        // set进去
+        setmealDto.setSetmealDishes(dishList);
+
+
+        return setmealDto;
+    }
+
+    @Override
+    @Transactional
+    public void updateSetmeal(SetmealDto setmealDto) {
+        Setmeal setmeal = new Setmeal();
+        //修改套餐表
+        BeanUtils.copyProperties(setmealDto,setmeal);
+
+        super.updateById(setmeal);
+
+        // 修改套餐菜品表
+        //删除
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(SetmealDish::getSetmealId,setmeal.getId());
+        setmealDishService.remove(queryWrapper);
+
+        // 保存
+        for (SetmealDish setmealDish : setmealDto.getSetmealDishes()) {
+            setmealDish.setSetmealId(setmealDto.getId());
+        }
+        setmealDishService.saveBatch(setmealDto.getSetmealDishes());
 
     }
 }
