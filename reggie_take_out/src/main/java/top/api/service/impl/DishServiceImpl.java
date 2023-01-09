@@ -60,7 +60,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }
 
         //Page 对象必须放在第一位
-        Page<DishDto> pageDish = dishMapper.page(pageInfo, page, pageSize, name);
+        Page<DishDto> pageDish = dishMapper.page(pageInfo, name);
 
         return pageDish;
     }
