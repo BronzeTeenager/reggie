@@ -33,8 +33,8 @@ public class UserController {
             return R.error("phone is null");
         }
 
-        userService.login(phone,session);
+        User user = userService.login(phone, session);
 
-        return R.success("success");
+        return R.success("success",user);
     }
 }
