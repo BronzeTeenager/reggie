@@ -38,7 +38,8 @@ public class LoginCheckFilter implements Filter {
                 "/employee/logout",
                 "/backend/**",
                 "/front/**",
-                "/common/**"
+                "/common/**",
+                "/user/login"
         };
 
         // 检测是否需要拦截
@@ -53,6 +54,17 @@ public class LoginCheckFilter implements Filter {
 
             //将empId存入到线程副本
             BaseContext.set(empId);
+
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+        // 检测是否登录
+        Long userId = (Long) request.getSession().getAttribute("user");
+        if (userId != null){
+
+            //将empId存入到线程副本
+            BaseContext.set(userId);
 
             filterChain.doFilter(request,response);
             return;

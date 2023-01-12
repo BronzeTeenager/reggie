@@ -49,16 +49,7 @@ public class Test2 {
      */
     @Test
     void three(){
-//        int num = 0;
-//        if(num%2!=0){
-//            System.out.print("奇数");
-//        }else{
-//            System.out.println("偶数");
-//        }
 
-
-        String md5 = DigestUtils.md5DigestAsHex("1234".getBytes());
-        System.out.println(md5);
     }
 
 }
