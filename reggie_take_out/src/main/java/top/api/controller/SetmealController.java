@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import top.api.common.R;
+import top.api.dto.DishDto;
 import top.api.dto.SetmealDto;
 import top.api.pojo.Setmeal;
 import top.api.pojo.SetmealDish;
@@ -103,5 +104,21 @@ public class SetmealController {
     public R<String> updateSetmeal(@RequestBody SetmealDto setmealDto){
         setmealService.updateSetmeal(setmealDto);
         return R.success("ok");
+    }
+
+    /**
+     * 根据菜品分类id查询套餐
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
+        queryWrapper.eq(setmeal.getStatus()!=null,Setmeal::getStatus,setmeal.getStatus());
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+
+        List<Setmeal> setmealList = setmealService.list(queryWrapper);
+
+        return R.success("ok",setmealList);
     }
 }

@@ -4,14 +4,19 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
+import top.api.common.BaseContext;
 import top.api.common.R;
 import top.api.dto.DishDto;
 import top.api.pojo.Dish;
+import top.api.pojo.DishFlavor;
 import top.api.service.DishFlavorService;
 import top.api.service.DishService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -75,7 +80,7 @@ public class DishController {
      * @return
      */
     @GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
+    public R<List<DishDto>> list(Dish dish){
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
         // 过滤停售菜品
@@ -85,6 +90,21 @@ public class DishController {
 
         List<Dish> dishList = dishService.list(queryWrapper);
 
-        return R.success("ok",dishList);
+        // 获取菜品口味
+        List<DishDto> dishDtoList  = new ArrayList<>();
+
+        for (Dish dish1 : dishList) {
+            Long dishId = dish1.getId();
+            LambdaQueryWrapper<DishFlavor> flavorLambdaQueryWrapper =  new LambdaQueryWrapper<>();
+            flavorLambdaQueryWrapper.in(DishFlavor::getDishId,dishId);
+            List<DishFlavor> dishFlavors = dishFlavorService.list(flavorLambdaQueryWrapper);
+
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(dish1,dishDto);
+            dishDto.setFlavors(dishFlavors);
+            dishDtoList.add(dishDto);
+        }
+
+        return R.success("ok",dishDtoList);
     }
 }

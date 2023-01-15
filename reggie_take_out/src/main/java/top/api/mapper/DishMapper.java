@@ -20,4 +20,5 @@ public interface DishMapper extends BaseMapper<Dish> {
 
     // Page对象必须放在第一位
     Page<DishDto> page(Page<Dish> pageInfo, @Param("name") String name);
+
 }
